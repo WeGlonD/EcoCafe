@@ -10,7 +10,6 @@
         android:id="@+id/main_bottom"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@android:color/white"
         app:layout_constraintBottom_toBottomOf="parent"
         app:menu="@menu/main_bottom_navigation" />
     <!--[출처] 안드로이드 스튜디오 :: 하단바(BottomNavigation) 만들기|작성자 재콩-->
