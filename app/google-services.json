@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "471411121152",
+    "project_id": "ecocafe-7ce2b",
+    "storage_bucket": "ecocafe-7ce2b.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:471411121152:android:6d6efb33801a9e020c8ce5",
+        "android_client_info": {
+          "package_name": "com.example.ecocafe"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "471411121152-pcghuqb8dcjv3s3t6gqes2k6ar4s09rj.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.ecocafe",
+            "certificate_hash": "3c7a56e20eea565a484f9fac6265b97fc16d28af"
+          }
+        },
+        {
+          "client_id": "471411121152-nnab4150bvnq41juoraagdnshb63cfhe.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAwzQ9VQFb8MK1w1azl1o3CgQhJE4El7CM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "471411121152-nnab4150bvnq41juoraagdnshb63cfhe.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
