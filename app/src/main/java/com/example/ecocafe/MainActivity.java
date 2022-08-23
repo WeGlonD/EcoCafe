@@ -5,8 +5,11 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.bottomnavigation.*;
@@ -26,6 +29,14 @@ public class MainActivity extends AppCompatActivity {
         BottomNavigationView main_bottom = findViewById(R.id.main_bottom);
         BottomNavigationHelper.disableShiftMode(main_bottom);
 
+        ((Button)findViewById(R.id.button)).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent it = new Intent(MainActivity.this, Cafe_List.class);
+                startActivity(it);
+            }
+        });
+
         //homeFragment = new HomeFragment();
         //listFragment = new ListFragment();
         //myPageFragment = new MyPageFragment();
@@ -39,7 +50,6 @@ public class MainActivity extends AppCompatActivity {
                 return true;
             }
         });
-
     }
 
     public void setFragment(int n) {
