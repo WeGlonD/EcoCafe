@@ -8,8 +8,6 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.IgnoreExtraProperties;
 
-import java.util.concurrent.atomic.AtomicBoolean;
-
 public class User {
     @IgnoreExtraProperties
     public static class  Data{
@@ -42,7 +40,7 @@ public class User {
     }
 
     private static FirebaseUser currentUser = null;
-    public static Context context;
+    public static Context context = null;
     public static Data data = null;
 
 
@@ -116,18 +114,16 @@ public class User {
         });
     }
 
-    public void logout(Acts acts){
+    public void logout(){
         Database db = new Database();
         FirebaseAuth mAuth = db.getAuth();
         String path = "firebase.User.logout - ";
 
         try {
             mAuth.signOut();
-            acts.ifSuccess(new Object());
             Log.d(context.getString(R.string.Dirtfy_test), path+"success");
         }
         catch (Exception e){
-            acts.ifFail(new Object());
             Log.d(context.getString(R.string.Dirtfy_test), path+"fail");
         }
     }

@@ -37,24 +37,6 @@ public class Database {
                 }
                 if(userRoot == null){
                     userRoot = mDBRoot.child(context.getString(R.string.DB_user));
-
-                    if(mAuth.getCurrentUser() != null){
-                        userRoot.child(mAuth.getCurrentUser().getUid()).
-                                addValueEventListener(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                String path = "userRoot.onDataChange - ";
-                                User.data = snapshot.getValue(User.Data.class);
-                                if(User.data != null)
-                                    Log.d("Dirtfy_test", path+"good " + String.valueOf(User.data.getPoint()));
-                            }
-
-                            @Override
-                            public void onCancelled(@NonNull DatabaseError error) {
-
-                            }
-                        });
-                    }
                 }
             }
 
@@ -92,6 +74,20 @@ public class Database {
     public DatabaseReference getUserRoot(){
         return userRoot;
     }
+    public void addUserValueEventListener(Reacts reacts){
+        userRoot.child(mAuth.getCurrentUser().getUid()).
+                addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        reacts.ifDataChanged(snapshot);
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+                        reacts.ifCancelled(error);
+                    }
+                });
+    }
     public FirebaseAuth getAuth(){
         return mAuth;
     }
@@ -111,7 +107,7 @@ public class Database {
         }
     }
 
-    public boolean readUser(){
+    public boolean readUser(Acts acts){
         String path = "firebase.Database.readUser - ";
 
         try {
@@ -120,11 +116,13 @@ public class Database {
             userRoot.child(mAuth.getCurrentUser().getUid()).
                     get().addOnCompleteListener(task -> {
                         if(task.isSuccessful()) {
-                            user.data = task.getResult().getValue(User.Data.class);
+                            User.data = task.getResult().getValue(User.Data.class);
+                            acts.ifSuccess(task);
                             Log.d(context.getString(R.string.Dirtfy_test), String.valueOf(user.data.getPoint()));
                             Log.d(context.getString(R.string.Dirtfy_test), path+"success");
                         }
                         else{
+                            acts.ifFail(task);
                             Log.d(context.getString(R.string.Dirtfy_test), path+"fail");
                         }
                     });
