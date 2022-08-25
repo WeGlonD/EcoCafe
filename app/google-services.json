@@ -1,6 +1,7 @@
 {
   "project_info": {
     "project_number": "471411121152",
+    "firebase_url": "https://ecocafe-7ce2b-default-rtdb.firebaseio.com",
     "project_id": "ecocafe-7ce2b",
     "storage_bucket": "ecocafe-7ce2b.appspot.com"
   },
@@ -13,6 +14,30 @@
         }
       },
       "oauth_client": [
+        {
+          "client_id": "471411121152-44jsjjphc5p4dl2i4t2onnvumvadqo1c.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.ecocafe",
+            "certificate_hash": "62b2d4e267e8350d03a6a9ae07548b6bb78e1cba"
+          }
+        },
+        {
+          "client_id": "471411121152-9umelba0ii2vduct2mts28n8cqgjefv1.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.ecocafe",
+            "certificate_hash": "d9f4a6984344fd40af31841df061d0e8c0a76a01"
+          }
+        },
+        {
+          "client_id": "471411121152-hrrvhkfrhc6tpj8mticnaumf1ioctf3n.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.ecocafe",
+            "certificate_hash": "443bf67fbff0f8adcf123539759d5aad12065791"
+          }
+        },
         {
           "client_id": "471411121152-pcghuqb8dcjv3s3t6gqes2k6ar4s09rj.apps.googleusercontent.com",
           "client_type": 1,
