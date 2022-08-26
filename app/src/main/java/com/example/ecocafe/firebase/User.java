@@ -39,18 +39,11 @@ public class User {
         }
     }
 
-    private static FirebaseUser currentUser = null;
     public static Context context = null;
-    public static Data data = null;
 
 
     public static void getInstance(){
         Database db = new Database();
-        if(db.getAuth() != null){
-            if(currentUser == null){
-                currentUser = db.getAuth().getCurrentUser();
-            }
-        }
     }
 
     public User(){
@@ -83,17 +76,28 @@ public class User {
         FirebaseAuth mAuth = db.getAuth();
         String path = "firebase.User.delete - ";
 
-        mAuth.getCurrentUser().delete().
-                addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        acts.ifSuccess(task);
-                        Log.d(context.getString(R.string.Dirtfy_test), path+"success");
-                    } else {
-                        acts.ifFail(task);
-                        Log.d(context.getString(R.string.Dirtfy_test), path+"fail");
+        db.removeUserValueEventListener();
+        db.getUserRoot().child(db.getAuth().getCurrentUser().getUid()).
+                removeValue().
+                addOnCompleteListener(valueTask -> {
+                    if(valueTask.isSuccessful()){
+                        Log.d(context.getString(R.string.Dirtfy_test), path+"value success");
+                        mAuth.getCurrentUser().delete().
+                                addOnCompleteListener(task -> {
+                                    if (task.isSuccessful()) {
+                                        acts.ifSuccess(task);
+                                        Log.d(context.getString(R.string.Dirtfy_test), path+"success");
+                                    } else {
+                                        acts.ifFail(task);
+                                        Log.d(context.getString(R.string.Dirtfy_test), path+"fail");
+                                    }
+                                });
                     }
-                });
-        db.getUserRoot().child(currentUser.getUid()).removeValue();
+                    else{
+                        Log.d(context.getString(R.string.Dirtfy_test), path+"value fail");
+                    }
+
+        });
     }
 
     public void login(String email, String password, Acts acts){

@@ -5,4 +5,5 @@
     <string name="DB_cafe">cafe</string>
     <string name="DB_post">post</string>
     <string name="DB_user">users</string>
+    <string name="ST_image">image</string>
 </resources>
