@@ -5,12 +5,12 @@ import android.util.Log;
 
 import com.example.ecocafe.R;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.IgnoreExtraProperties;
 
 public class User {
     @IgnoreExtraProperties
     public static class  Data{
+        private Boolean isManager;
         private String name;
         private Long point;
 
@@ -18,14 +18,27 @@ public class User {
         }
 
         public Data(String name, Long point){
+            this.isManager = false;
             this.name = name;
             this.point = point;
+        }
+
+        public Data(Boolean isManager, String name, Long point){
+            this.isManager = isManager;
+            this.name = name;
+            this.point = point;
+        }
+
+        public boolean getIsManager(){
+            return isManager;
+        }
+        public void setIsManager(Boolean isManager){
+            this.isManager = isManager;
         }
 
         public String getName() {
             return name;
         }
-
         public void setName(String name) {
             this.name = name;
         }
@@ -33,7 +46,6 @@ public class User {
         public Long getPoint() {
             return point;
         }
-
         public void setPoint(Long point) {
             this.point = point;
         }

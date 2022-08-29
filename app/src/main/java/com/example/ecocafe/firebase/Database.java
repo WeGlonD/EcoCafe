@@ -8,6 +8,7 @@ import androidx.annotation.NonNull;
 
 import com.example.ecocafe.R;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -15,6 +16,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageMetadata;
 import com.google.firebase.storage.StorageReference;
 
 import java.util.ArrayList;
@@ -170,7 +172,35 @@ public class Database {
         StorageReference newFile = imageRoot.child(file.getLastPathSegment());
         newFile.putFile(file).addOnCompleteListener(task -> {
             if(task.isSuccessful()){
-                acts.ifSuccess(task);
+                readUser(new Acts() {
+                    @Override
+                    public void ifSuccess(Object task) {
+                        User.Data data = ((Task<DataSnapshot>) task).getResult().getValue(User.Data.class);
+                        StorageMetadata metadata = new StorageMetadata.Builder().
+                                setCustomMetadata("Uploader_Uid", mAuth.getUid()).
+                                setCustomMetadata("Uploader_Name", data.getName()).
+                                build();
+
+                        newFile.updateMetadata(metadata).
+                                addOnCompleteListener(tsk -> {
+                                    if (tsk.isSuccessful()){
+                                        acts.ifSuccess(task);
+                                        Log.d(context.getString(R.string.Dirtfy_test), path+"updateMetadata - "+"success");
+                                    }
+                                    else{
+                                        acts.ifFail(task);
+                                        Log.d(context.getString(R.string.Dirtfy_test), path+"updateMetadata - "+"fail");
+                                    }
+                                });
+                    }
+
+                    @Override
+                    public void ifFail(Object task) {
+                        acts.ifFail(task);
+                        Log.d(context.getString(R.string.Dirtfy_test), path+"readUser - "+"success");
+                    }
+                });
+
                 Log.d(context.getString(R.string.Dirtfy_test), path+"success");
             }
             else{
