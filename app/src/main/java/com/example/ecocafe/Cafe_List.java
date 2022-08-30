@@ -61,7 +61,7 @@ public class Cafe_List extends AppCompatActivity {
             }
         });
 
-        adapter = new CustomAdapter(arrayList, this);
+        //adapter = new CustomAdapter(arrayList, this);
         recyclerView.setAdapter(adapter);
     }
 }

@@ -58,8 +58,8 @@ public class MainActivity extends AppCompatActivity {
                 return true;
             }
         });
-
-
+        Database mDB = new Database(getApplicationContext());
+/*
         ///유저 로그인 및 유저 정보 저장(예시)
         EditText email = findViewById(R.id.email);
         EditText password = findViewById(R.id.password);
@@ -71,7 +71,7 @@ public class MainActivity extends AppCompatActivity {
         TextView user_point = findViewById(R.id.point);
 
         User user = new User(getApplicationContext());
-        Database mDB = new Database(getApplicationContext());
+
         if (mDB.getAuth().getCurrentUser() != null){
             mDB.getAuth().signOut();
         }
@@ -173,9 +173,8 @@ public class MainActivity extends AppCompatActivity {
 
                 }
             });
-        });
+        });*/
     }
-
     public void setFragment(int n) {
         fragmentManager = getSupportFragmentManager();
         fragmentTransaction = fragmentManager.beginTransaction();

@@ -6,14 +6,14 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-<!--    유저 정보 확인용 UI-->
+    <!--    유저 정보 확인용 UI-->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/test_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toTopOf="@id/main_frame">
-
+<!--
         <EditText
             android:id="@+id/email"
             android:layout_width="match_parent"
@@ -84,7 +84,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:layout_constraintTop_toBottomOf="@id/name"
-            app:layout_constraintBottom_toBottomOf="parent"/>
+            app:layout_constraintBottom_toBottomOf="parent"/>-->
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <FrameLayout

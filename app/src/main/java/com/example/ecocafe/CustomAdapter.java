@@ -12,15 +12,16 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.example.ecocafe.firebase.Cafe;
 
 import java.util.ArrayList;
 
 public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.CustomViewHolder>{
 
-    private ArrayList<Cafe_item> arrayList;
+    private ArrayList<Cafe> arrayList;
     private Context context;
 
-    public CustomAdapter(ArrayList<Cafe_item> arrayList, Context context) {
+    public CustomAdapter(ArrayList<Cafe> arrayList, Context context) {
         this.arrayList = arrayList;
         this.context = context;
     }
@@ -49,7 +50,7 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.CustomView
         return (arrayList != null ? arrayList.size() : 0);
     }
 
-    public class CustomViewHolder extends RecyclerView.ViewHolder {
+    public static class CustomViewHolder extends RecyclerView.ViewHolder {
         ImageView iv_pic;
         TextView tv_name;
         TextView tv_event;

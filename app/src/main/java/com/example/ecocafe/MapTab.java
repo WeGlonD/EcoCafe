@@ -19,6 +19,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -26,7 +29,10 @@ import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.example.ecocafe.firebase.Acts;
 import com.example.ecocafe.firebase.Cafe;
 import com.example.ecocafe.firebase.CafeQuery;
@@ -55,9 +61,13 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.maps.android.SphericalUtil;
+import com.sothree.slidinguppanel.PanelSlideListener;
+import com.sothree.slidinguppanel.PanelState;
+import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
@@ -69,10 +79,23 @@ public class MapTab extends Fragment implements OnMapReadyCallback, ActivityComp
     FrameLayout mLayout;
     boolean first = true;
 
-    private ArrayList<Cafe_item> cafes;
+    private ArrayList<Cafe> cafes;
     private FirebaseDatabase database;
     private DatabaseReference databaseReference;
 
+    private SlidingUpPanelLayout sliding;
+
+    private RecyclerView cafeListRecycler;
+    private RecyclerView.Adapter adapter;
+    private RecyclerView.LayoutManager layoutManager;
+
+    private CustomAdapter.CustomViewHolder customViewHolder;
+
+    private LinearLayout firstShownCafeInfo;
+    private ImageView iv_pic_first;
+    private TextView tv_name_first;
+    private TextView tv_link_first;
+    private TextView tv_event_first;
 
     private static final String TAG = "googlemap_ecocafe";
     private static final int GPS_ENABLE_REQUEST_CODE = 2001;
@@ -89,7 +112,7 @@ public class MapTab extends Fragment implements OnMapReadyCallback, ActivityComp
     String[] REQUIRED_PERMISSIONS = {Manifest.permission.ACCESS_FINE_LOCATION,Manifest.permission.ACCESS_COARSE_LOCATION};
 
     Location mCurrentLocation;
-    LatLng currentPosition;
+    public static LatLng currentPosition;
 
     @Nullable
     @Override
@@ -99,6 +122,32 @@ public class MapTab extends Fragment implements OnMapReadyCallback, ActivityComp
         mapView.onCreate(savedInstanceState);
         mapView.getMapAsync(this);
         mLayout = view.findViewById(R.id.main_frame);
+
+//        iv_pic_first = view.findViewById(R.id.iv_pic_first);
+//        tv_name_first = view.findViewById(R.id.tv_name_first);
+//        tv_link_first = view.findViewById(R.id.tv_link_first);
+//        tv_event_first = view.findViewById(R.id.tv_event_first);
+
+
+
+        sliding = view.findViewById(R.id.slide);
+        sliding.addPanelSlideListener(new PanelSlideListener() {
+            @Override
+            public void onPanelSlide(View view, float v) {
+                Collections.sort(cafes);
+                adapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onPanelStateChanged(View view, PanelState panelState, PanelState panelState1) {
+                return;
+            }
+        });
+
+        cafeListRecycler = view.findViewById(R.id.cafeListRecycler);
+        cafeListRecycler.setHasFixedSize(true);
+        layoutManager = new LinearLayoutManager(getContext());
+        cafeListRecycler.setLayoutManager(layoutManager);
 
         getActivity().getWindow().setFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON,WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         locationRequest = new LocationRequest()
@@ -157,14 +206,24 @@ public class MapTab extends Fragment implements OnMapReadyCallback, ActivityComp
         googleMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
             @Override
             public void onInfoWindowClick(Marker marker) {
-                double distance = SphericalUtil.computeDistanceBetween(currentPosition, marker.getPosition());
-                Toast.makeText(getContext(), "현위치부터 " + String.format("%.2f", distance/1000) + "km 거리", Toast.LENGTH_LONG).show();
+                //double distance = SphericalUtil.computeDistanceBetween(currentPosition, marker.getPosition());
+                //Toast.makeText(getContext(), "현위치부터 " + String.format("%.2f", distance/1000) + "km 거리", Toast.LENGTH_LONG).show();
+                int idx = (int)marker.getTag();
+                Cafe first = cafes.get(idx);
+                CustomAdapter.CustomViewHolder holder = new CustomAdapter.CustomViewHolder(view.findViewById(R.id.cafe_item_layout));
+                Glide.with(holder.itemView)
+                        .load(first.getPic())
+                        .into(holder.iv_pic);
+
+                holder.tv_event.setText(first.getEvent());
+                holder.tv_name.setText(first.getName());
+                holder.tv_link.setText(first.getLink());
             }
         });
 
 
         //민석이 db활용
-        ArrayList<Cafe> cafes = new ArrayList<>();
+        cafes = new ArrayList<>();
         Database db = new Database();
         db.readAllCafe(cafes, new CafeQuery() {
             @Override
@@ -174,13 +233,20 @@ public class MapTab extends Fragment implements OnMapReadyCallback, ActivityComp
         }, new Acts() {
             @Override
             public void ifSuccess(Object task) {
-                for(Cafe tmp : cafes){
+                Collections.sort(cafes);
+                for(int i = 0; i < cafes.size(); i++){
+                     Cafe tmp = cafes.get(i);
                      MarkerOptions markerOptions = new MarkerOptions()
                              .title(tmp.getName())
                              .position(new LatLng(tmp.getLat(),tmp.getLng()))
                              .snippet(getCurrentAddress(new LatLng(tmp.getLat(),tmp.getLng())));
-                     googleMap.addMarker(markerOptions);
+                     Marker marker = googleMap.addMarker(markerOptions);
+                     marker.setTag(i);
                 }
+                //Toast.makeText(getContext(), ""+cafes.size(), Toast.LENGTH_LONG).show();
+                //슬라이딩업패널에 리스트 구축(현위치 거리 정렬)
+                adapter = new CustomAdapter(cafes, getContext());
+                cafeListRecycler.setAdapter(adapter);
             }
 
             @Override
@@ -188,6 +254,7 @@ public class MapTab extends Fragment implements OnMapReadyCallback, ActivityComp
                 return;
             }
         });
+
 
 
         //위치 퍼미션 체크
@@ -341,6 +408,7 @@ public class MapTab extends Fragment implements OnMapReadyCallback, ActivityComp
     public void setDefaultLocation() {
         //디폴트 위치 서울
         LatLng DEFAULT_LOCATION = new LatLng(37.56,126.97);
+        currentPosition = DEFAULT_LOCATION;
         String markerTitle = "위치정보 가져올 수 없음";
         String markerSnippet = "위치 퍼미션과 GPS 활성 여부를 확인하세요";
 

@@ -1,8 +1,10 @@
 package com.example.ecocafe.firebase;
 
+import com.example.ecocafe.MapTab;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.maps.android.SphericalUtil;
 
-public class Cafe {
+public class Cafe implements Comparable<Cafe> {
     //private int id;
     private String name;
     private double lat;
@@ -61,5 +63,19 @@ public class Cafe {
 
     public void setLink(String link) {
         this.link = link;
+    }
+
+    @Override
+    public int compareTo(Cafe cafe) {
+        LatLng positionThis = new LatLng(this.lat, this.lng);
+        double distanceThis = SphericalUtil.computeDistanceBetween(MapTab.currentPosition, positionThis);
+        LatLng positionOther = new LatLng(cafe.lat, cafe.lng);
+        double distanceOther = SphericalUtil.computeDistanceBetween(MapTab.currentPosition, positionOther);
+        if(distanceThis > distanceOther)
+            return 1;
+        else if(distanceThis < distanceOther)
+            return -1;
+        else
+            return 0;
     }
 }
