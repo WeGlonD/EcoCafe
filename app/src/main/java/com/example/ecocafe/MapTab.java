@@ -49,6 +49,11 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.material.snackbar.Snackbar;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.maps.android.SphericalUtil;
 
 import java.io.IOException;
@@ -63,6 +68,10 @@ public class MapTab extends Fragment implements OnMapReadyCallback, ActivityComp
     Marker currentMarker = null;
     FrameLayout mLayout;
     boolean first = true;
+
+    private ArrayList<Cafe_item> cafes;
+    private FirebaseDatabase database;
+    private DatabaseReference databaseReference;
 
 
     private static final String TAG = "googlemap_ecocafe";
@@ -100,6 +109,37 @@ public class MapTab extends Fragment implements OnMapReadyCallback, ActivityComp
         LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder();
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this.getActivity());
 
+        /*
+        //동기 db활용
+        cafes = new ArrayList<>();//객체 담을 어레이리스트
+        database = FirebaseDatabase.getInstance();
+
+        databaseReference = database.getReference("cafe");
+        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                //파이어베이스 데이터베이스의 데이터를 받아오는 곳
+                cafes.clear();//기존 배열리스트가 존재하지 않게 초기화
+                for(DataSnapshot snapshot : dataSnapshot.getChildren()) {//반복문으로 데이터 List를 추출해냄
+                    Cafe_item cafe_item = snapshot.getValue(Cafe_item.class);
+                    cafes.add(cafe_item);//담은 데이터들을 배열리스트에 넣고 리사이클러 뷰로 보낼 준비
+                }
+                googleMap.clear();
+                for(Cafe_item cafe : cafes){
+                    LatLng cafePosition = new LatLng(cafe.getLat(),cafe.getLng());
+                    MarkerOptions markerOptions = new MarkerOptions().title(cafe.getName()).position(cafePosition).snippet(getCurrentAddress(cafePosition));
+                    googleMap.addMarker(markerOptions);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                //디비를 가져오던 중 에러 발생 시
+                //Log.e("Cafe_List",String.valueOf(databaseError.toException()));
+            }
+        });
+        */
+
         return view;
     }
 
@@ -110,8 +150,9 @@ public class MapTab extends Fragment implements OnMapReadyCallback, ActivityComp
         setDefaultLocation();
 
         //밑에 두 줄 대신에 firebase에서 정보 갖고와서 마커 찍는 코드 작성해야함.
-        MarkerOptions options = new MarkerOptions().position(new LatLng(35.889131,128.591447)).title("KFC 침산네거리점").snippet(getCurrentAddress(new LatLng(35.889131,128.591447)));
-        Marker tmp = googleMap.addMarker(options);
+        //MarkerOptions options = new MarkerOptions().position(new LatLng(35.889131,128.591447)).title("KFC 침산네거리점").snippet(getCurrentAddress(new LatLng(35.889131,128.591447)));
+        //Marker tmp = googleMap.addMarker(options);
+
 
         googleMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
             @Override
@@ -121,6 +162,8 @@ public class MapTab extends Fragment implements OnMapReadyCallback, ActivityComp
             }
         });
 
+
+        //민석이 db활용
         ArrayList<Cafe> cafes = new ArrayList<>();
         Database db = new Database();
         db.readAllCafe(cafes, new CafeQuery() {
@@ -145,6 +188,7 @@ public class MapTab extends Fragment implements OnMapReadyCallback, ActivityComp
                 return;
             }
         });
+
 
         //위치 퍼미션 체크
         int hasFineLocationPermission = ContextCompat.checkSelfPermission(this.getContext(), android.Manifest.permission.ACCESS_FINE_LOCATION);
@@ -260,7 +304,7 @@ public class MapTab extends Fragment implements OnMapReadyCallback, ActivityComp
         }
 
         if(addresses == null || addresses.size() == 0){
-            Toast.makeText(getContext(), "주소 미발견", Toast.LENGTH_LONG).show();
+            //Toast.makeText(getContext(), "주소 미발견", Toast.LENGTH_LONG).show();
             return "주소 미발견";
         }else{
             Address address = addresses.get(0);
@@ -285,7 +329,7 @@ public class MapTab extends Fragment implements OnMapReadyCallback, ActivityComp
         markerOptions.snippet(markerSnippet);
         markerOptions.draggable(true);
 
-        currentMarker = googleMap.addMarker(markerOptions);
+        //currentMarker = googleMap.addMarker(markerOptions);
 
         if(first) {
             CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLng(currentLatLng);
@@ -308,7 +352,7 @@ public class MapTab extends Fragment implements OnMapReadyCallback, ActivityComp
         markerOptions.snippet(markerSnippet);
         markerOptions.draggable(true);
         markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
-        currentMarker = googleMap.addMarker(markerOptions);
+        //currentMarker = googleMap.addMarker(markerOptions);
 
         CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(DEFAULT_LOCATION,15);
         googleMap.moveCamera(cameraUpdate);

@@ -260,10 +260,9 @@ public class Database {
 
         cafeRoot.get().addOnCompleteListener(task -> {
             if (task.isSuccessful()){
-                ArrayList<Cafe> all = new ArrayList<>();
-                HashMap<String, Cafe> hashMap = (HashMap<String, Cafe>) task.getResult().getValue();
-                Collection<Cafe> tmp = hashMap.values();
-                returnList.addAll(tmp);
+                for(DataSnapshot dataSnapshot : task.getResult().getChildren()){
+                    returnList.add(dataSnapshot.getValue(Cafe.class));
+                }
                 acts.ifSuccess(task);
                 Log.d(context.getString(R.string.Dirtfy_test), path+"success");
             }

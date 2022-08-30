@@ -7,7 +7,8 @@ import com.google.android.gms.maps.model.LatLng;
 public class Cafe_item {
     //private int id;
     private String name;
-    private LatLng latLng;
+    private double lat;
+    private double lng;
     private String Event;
     private String pic;
     private String link;
@@ -31,13 +32,11 @@ public class Cafe_item {
         this.name = name;
     }
 
-    public LatLng getLatLng() {
-        return latLng;
-    }
+    public double getLat() { return lat; }
+    public double getLng() { return lng;}
 
-    public void setLatLng(LatLng latLng) {
-        this.latLng = latLng;
-    }
+    public void setLat(double lat) { this.lat = lat; }
+    public void setLng(double lng) { this.lng = lng; }
 
     public String getPic() {
         return pic;
