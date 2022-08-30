@@ -21,6 +21,7 @@ import com.google.firebase.storage.StorageReference;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 
 public class Database {
     private static DatabaseReference mDBRoot = null;
@@ -216,8 +217,8 @@ public class Database {
     public boolean writeCafe(Cafe cafe){
         String path = "firebase.Database.writeCafe - ";
         try{
-            String latBlock = String.valueOf((long) (cafe.getLatLng().latitude / 0.005));
-            String lngBlock = String.valueOf((long) (cafe.getLatLng().longitude / 0.005));
+            String latBlock = String.valueOf((long) (cafe.getLat() / 0.005));
+            String lngBlock = String.valueOf((long) (cafe.getLng() / 0.005));
 
             cafeRoot.child(latBlock).child(lngBlock).child(cafe.getName()).setValue(cafe);
 
@@ -238,7 +239,9 @@ public class Database {
         cafeRoot.child(latBlock).child(lngBlock).get().addOnCompleteListener(task -> {
             if (task.isSuccessful()){
                 ArrayList<Cafe> all = new ArrayList<>();
-                all.addAll((Collection<? extends Cafe>) task.getResult().getValue());
+                HashMap<String, Cafe> hashMap = (HashMap<String, Cafe>) task.getResult().getValue();
+
+                all.addAll(hashMap.values());
                 for (Cafe cafe : all) {
                     if(con.Q(cafe))
                         returnList.add(cafe);
@@ -258,11 +261,9 @@ public class Database {
         cafeRoot.get().addOnCompleteListener(task -> {
             if (task.isSuccessful()){
                 ArrayList<Cafe> all = new ArrayList<>();
-                all.addAll((Collection<? extends Cafe>) task.getResult().getValue());
-                for (Cafe cafe : all) {
-                    if(con.Q(cafe))
-                        returnList.add(cafe);
-                }
+                HashMap<String, Cafe> hashMap = (HashMap<String, Cafe>) task.getResult().getValue();
+                Collection<Cafe> tmp = hashMap.values();
+                returnList.addAll(tmp);
                 acts.ifSuccess(task);
                 Log.d(context.getString(R.string.Dirtfy_test), path+"success");
             }

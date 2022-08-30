@@ -27,6 +27,10 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
+import com.example.ecocafe.firebase.Acts;
+import com.example.ecocafe.firebase.Cafe;
+import com.example.ecocafe.firebase.CafeQuery;
+import com.example.ecocafe.firebase.Database;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
@@ -45,8 +49,10 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.material.snackbar.Snackbar;
+import com.google.maps.android.SphericalUtil;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
@@ -56,6 +62,8 @@ public class MapTab extends Fragment implements OnMapReadyCallback, ActivityComp
     GoogleMap googleMap;
     Marker currentMarker = null;
     FrameLayout mLayout;
+    boolean first = true;
+
 
     private static final String TAG = "googlemap_ecocafe";
     private static final int GPS_ENABLE_REQUEST_CODE = 2001;
@@ -99,9 +107,44 @@ public class MapTab extends Fragment implements OnMapReadyCallback, ActivityComp
     public void onMapReady(GoogleMap googleMap) {
         Log.d(TAG, "onMapReady :");
         this.googleMap = googleMap;
-        MapsInitializer.initialize(this.getActivity());
-        LatLng Seoul = new LatLng(37.56,126.97);
-        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(Seoul,10));
+        setDefaultLocation();
+
+        //밑에 두 줄 대신에 firebase에서 정보 갖고와서 마커 찍는 코드 작성해야함.
+        MarkerOptions options = new MarkerOptions().position(new LatLng(35.889131,128.591447)).title("KFC 침산네거리점").snippet(getCurrentAddress(new LatLng(35.889131,128.591447)));
+        Marker tmp = googleMap.addMarker(options);
+
+        googleMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
+            @Override
+            public void onInfoWindowClick(Marker marker) {
+                double distance = SphericalUtil.computeDistanceBetween(currentPosition, marker.getPosition());
+                Toast.makeText(getContext(), "현위치부터 " + String.format("%.2f", distance/1000) + "km 거리", Toast.LENGTH_LONG).show();
+            }
+        });
+
+        ArrayList<Cafe> cafes = new ArrayList<>();
+        Database db = new Database();
+        db.readAllCafe(cafes, new CafeQuery() {
+            @Override
+            public boolean Q(Cafe cafe) {
+                return true;
+            }
+        }, new Acts() {
+            @Override
+            public void ifSuccess(Object task) {
+                for(Cafe tmp : cafes){
+                     MarkerOptions markerOptions = new MarkerOptions()
+                             .title(tmp.getName())
+                             .position(new LatLng(tmp.getLat(),tmp.getLng()))
+                             .snippet(getCurrentAddress(new LatLng(tmp.getLat(),tmp.getLng())));
+                     googleMap.addMarker(markerOptions);
+                }
+            }
+
+            @Override
+            public void ifFail(Object task) {
+                return;
+            }
+        });
 
         //위치 퍼미션 체크
         int hasFineLocationPermission = ContextCompat.checkSelfPermission(this.getContext(), android.Manifest.permission.ACCESS_FINE_LOCATION);
@@ -244,8 +287,11 @@ public class MapTab extends Fragment implements OnMapReadyCallback, ActivityComp
 
         currentMarker = googleMap.addMarker(markerOptions);
 
-        CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLng(currentLatLng);
-        googleMap.moveCamera(cameraUpdate);
+        if(first) {
+            CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLng(currentLatLng);
+            googleMap.moveCamera(cameraUpdate);
+            first = false;
+        }
     }
 
     public void setDefaultLocation() {
