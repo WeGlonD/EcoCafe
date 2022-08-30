@@ -238,13 +238,11 @@ public class Database {
 
         cafeRoot.child(latBlock).child(lngBlock).get().addOnCompleteListener(task -> {
             if (task.isSuccessful()){
-                ArrayList<Cafe> all = new ArrayList<>();
-                HashMap<String, Cafe> hashMap = (HashMap<String, Cafe>) task.getResult().getValue();
-
-                all.addAll(hashMap.values());
-                for (Cafe cafe : all) {
-                    if(con.Q(cafe))
+                for(DataSnapshot dataSnapshot : task.getResult().getChildren()){
+                    Cafe cafe = dataSnapshot.getValue(Cafe.class);
+                    if(con.Q(cafe)){
                         returnList.add(cafe);
+                    }
                 }
                 acts.ifSuccess(task);
                 Log.d(context.getString(R.string.Dirtfy_test), path+"success");
@@ -292,11 +290,11 @@ public class Database {
 
         postRoot.child(name).get().addOnCompleteListener(task -> {
            if (task.isSuccessful()){
-               ArrayList<Post> all = new ArrayList<>();
-               all.addAll((Collection<? extends Post>) task.getResult().getValue());
-               for (Post post : all) {
-                   if(con.Q(post))
+               for(DataSnapshot dataSnapshot : task.getResult().getChildren()){
+                   Post post = dataSnapshot.getValue(Post.class);
+                   if(con.Q(post)){
                        returnList.add(post);
+                   }
                }
                acts.ifSuccess(task);
                Log.d(context.getString(R.string.Dirtfy_test), path+"success");
