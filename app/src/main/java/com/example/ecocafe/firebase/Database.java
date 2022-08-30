@@ -252,6 +252,26 @@ public class Database {
             }
         });
     }
+    public void readAllCafe(ArrayList<Cafe> returnList, CafeQuery con, Acts acts){
+        String path = "firebase.Database.readAllCafe - ";
+
+        cafeRoot.get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()){
+                ArrayList<Cafe> all = new ArrayList<>();
+                all.addAll((Collection<? extends Cafe>) task.getResult().getValue());
+                for (Cafe cafe : all) {
+                    if(con.Q(cafe))
+                        returnList.add(cafe);
+                }
+                acts.ifSuccess(task);
+                Log.d(context.getString(R.string.Dirtfy_test), path+"success");
+            }
+            else{
+                acts.ifFail(task);
+                Log.d(context.getString(R.string.Dirtfy_test), path+"fail");
+            }
+        });
+    }
 
     public boolean writePost(Post post){
         String path = "firebase.Database.writePost - ";
