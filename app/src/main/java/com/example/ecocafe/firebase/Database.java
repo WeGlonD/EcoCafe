@@ -1,6 +1,8 @@
 package com.example.ecocafe.firebase;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.util.Log;
 
@@ -19,6 +21,7 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageMetadata;
 import com.google.firebase.storage.StorageReference;
 
+import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -69,6 +72,7 @@ public class Database {
         }
     }
 
+    //생성자
     public Database(){
         getInstance();
     }
@@ -76,6 +80,7 @@ public class Database {
         this.context = context;
         getInstance();
     }
+    //데이터 바뀔때 쓰는 생성자
     public Database(ValueEventListener cafe,
                     ValueEventListener post,
                     ValueEventListener user,
@@ -96,12 +101,15 @@ public class Database {
     public DatabaseReference getUserRoot(){
         return userRoot;
     }
+
+    //리스너 제거(유저)
     public void removeUserValueEventListener(){
         userRoot.child(mAuth.getCurrentUser().getUid()).
                 removeEventListener(userDataListener);
         userDataListener = null;
         Log.d(context.getString(R.string.Dirtfy_test), "removeUserValueEventListener end");
     }
+    //리스너 붙이기(유저)
     public void setUserValueEventListener(Reacts reacts){
         if(userDataListener != null){
             removeUserValueEventListener();
@@ -121,10 +129,12 @@ public class Database {
         userRoot.child(mAuth.getCurrentUser().getUid()).
                 addValueEventListener(userDataListener);
     }
+    //계정관리
     public FirebaseAuth getAuth(){
         return mAuth;
     }
 
+    //데이터베이스 쓰기
     public boolean writeUser(User.Data data){
         String path = "firebase.Database.writeUser - ";
         try{
@@ -139,6 +149,8 @@ public class Database {
             return false;
         }
     }
+
+    //데이터 베이스 읽기
     public boolean readUser(Acts acts){
         String path = "firebase.Database.readUser - ";
 
@@ -167,11 +179,59 @@ public class Database {
         }
     }
 
-    public void writeImage(Uri file, Acts acts){
+    public void writeImage(Uri file, String imageName, Acts acts){
         String path = "firebase.Database.writeImage - ";
 
-        StorageReference newFile = imageRoot.child(file.getLastPathSegment());
+        StorageReference newFile = imageRoot.child(imageName);
         newFile.putFile(file).addOnCompleteListener(task -> {
+            if(task.isSuccessful()){
+                readUser(new Acts() {
+                    @Override
+                    public void ifSuccess(Object task) {
+                        User.Data data = ((Task<DataSnapshot>) task).getResult().getValue(User.Data.class);
+                        StorageMetadata metadata = new StorageMetadata.Builder().
+                                setCustomMetadata("Uploader_Uid", mAuth.getUid()).
+                                setCustomMetadata("Uploader_Name", data.getName()).
+                                build();
+
+                        newFile.updateMetadata(metadata).
+                                addOnCompleteListener(tsk -> {
+                                    if (tsk.isSuccessful()){
+                                        acts.ifSuccess(task);
+                                        Log.d(context.getString(R.string.Dirtfy_test), path+"updateMetadata - "+"success");
+                                    }
+                                    else{
+                                        acts.ifFail(task);
+                                        Log.d(context.getString(R.string.Dirtfy_test), path+"updateMetadata - "+"fail");
+                                    }
+                                });
+                    }
+
+                    @Override
+                    public void ifFail(Object task) {
+                        acts.ifFail(task);
+                        Log.d(context.getString(R.string.Dirtfy_test), path+"readUser - "+"success");
+                    }
+                });
+
+                Log.d(context.getString(R.string.Dirtfy_test), path+"success");
+            }
+            else{
+                acts.ifFail(task);
+                Log.d(context.getString(R.string.Dirtfy_test), path+"fail");
+            }
+        });
+    }
+    public void writeImage(BitmapDrawable bitmapDrawable, String imageName, Acts acts){
+        String path = "firebase.Database.writeImage - ";
+
+        Bitmap bitmap = bitmapDrawable.getBitmap();
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+        byte[] data = baos.toByteArray();
+
+        StorageReference newFile = imageRoot.child(imageName);
+        newFile.putBytes(data).addOnCompleteListener(task -> {
             if(task.isSuccessful()){
                 readUser(new Acts() {
                     @Override

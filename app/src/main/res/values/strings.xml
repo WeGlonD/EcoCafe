@@ -2,8 +2,8 @@
     <string name="app_name">EcoCafe</string>
 
     <string name="Dirtfy_test">Dirtfy_test</string>
-    <string name="DB_cafe">cafe</string>
-    <string name="DB_post">post</string>
+    <string name="DB_cafe">cafes</string>
+    <string name="DB_post">posts</string>
     <string name="DB_user">users</string>
-    <string name="ST_image">image</string>
+    <string name="ST_image">images</string>
 </resources>

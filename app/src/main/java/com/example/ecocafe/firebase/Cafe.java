@@ -65,6 +65,7 @@ public class Cafe implements Comparable<Cafe> {
         this.link = link;
     }
 
+    //(객체)거리 비교 함수
     @Override
     public int compareTo(Cafe cafe) {
         LatLng positionThis = new LatLng(this.lat, this.lng);
