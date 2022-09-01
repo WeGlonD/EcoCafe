@@ -47,7 +47,7 @@ public class MainActivity extends AppCompatActivity {
     ConstraintLayout mainActivityLayout;
 
     private static final int PERMISSIONS_REQUEST_CODE = 100;
-    String[] REQUIRED_PERMISSIONS = {android.Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION};
+    String[] REQUIRED_PERMISSIONS = {android.Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.CAMERA};
     private static final int GPS_ENABLE_REQUEST_CODE = 2001;
     boolean needRequest = false;
 
@@ -71,11 +71,12 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        //위치 퍼미션 체크
+        //위치 퍼미션 체크,카메라 권한 체크
         int hasFineLocationPermission = ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION);
         int hasCoarseLocationPermission = ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION);
+        int CameraPermissionCheck = ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.CAMERA);
 
-        if(hasFineLocationPermission == PackageManager.PERMISSION_GRANTED && hasCoarseLocationPermission == PackageManager.PERMISSION_GRANTED){
+        if(hasFineLocationPermission == PackageManager.PERMISSION_GRANTED && hasCoarseLocationPermission == PackageManager.PERMISSION_GRANTED && CameraPermissionCheck == PackageManager.PERMISSION_GRANTED){
             //startLocationUpdates();
         }else{
             //퍼미션 거부한 적 있는 경우
@@ -86,12 +87,23 @@ public class MainActivity extends AppCompatActivity {
                         ActivityCompat.requestPermissions(mainInstance, REQUIRED_PERMISSIONS, PERMISSIONS_REQUEST_CODE);
                     }
                 }).show();
-            }else{
+            }
+            else if(ActivityCompat.shouldShowRequestPermissionRationale(this,REQUIRED_PERMISSIONS[2])){
+                Snackbar.make(mainActivityLayout, "이 앱을 실행하려면 카메라 접근 권한이 필요합니다.", Snackbar.LENGTH_INDEFINITE).setAction("확인", new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        ActivityCompat.requestPermissions(mainInstance, REQUIRED_PERMISSIONS, PERMISSIONS_REQUEST_CODE);
+                    }
+                }).show();
+            }
+            else{
                 //퍼미션 거부 한적 없으면 퍼미션 요청 바로 함
                 //요청결과는 onRequestPermissionResult에 수신
                 ActivityCompat.requestPermissions(this, REQUIRED_PERMISSIONS, PERMISSIONS_REQUEST_CODE);
             }
         }
+
+
 
         //homeFragment = new HomeFragment();
         //listFragment = new ListFragment();
@@ -107,121 +119,121 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         Database mDB = new Database(getApplicationContext());
-/*
-        ///유저 로그인 및 유저 정보 저장(예시)
-        EditText email = findViewById(R.id.email);
-        EditText password = findViewById(R.id.password);
-        Button create_btn = findViewById(R.id.create_btn);
-        Button login_btn = findViewById(R.id.login_btn);
-        Button logout_btn = findViewById(R.id.logout_btn);
-        Button delete_btn = findViewById(R.id.delete_btn);
-        TextView user_name = findViewById(R.id.name);
-        TextView user_point = findViewById(R.id.point);
 
-        User user = new User(getApplicationContext());
-
-        if (mDB.getAuth().getCurrentUser() != null){
-            mDB.getAuth().signOut();
-        }
-
-        user_name.setText("-----");
-        user_point.setText(String.valueOf(0));
-
-        create_btn.setOnClickListener(view -> {
-            Boolean isManager = true;
-            String name = "dirtfy";
-            Long point = Long.valueOf(1000);
-            User.Data data = new User.Data(isManager, name, point);
-            user.create(email.getText().toString(), password.getText().toString(), new Acts() {
-                @Override
-                public void ifSuccess(Object task) {
-                    mDB.writeUser(data);
-                    user_name.setText(name);
-                    user_point.setText(String.valueOf(point));
-                    user.login(email.getText().toString(), password.getText().toString(), new Acts() {
-                        @Override
-                        public void ifSuccess(Object task) {
-                            afterLoginSuccess(mDB, user_name, user_point);
-                        }
-
-                        @Override
-                        public void ifFail(Object task) {
-
-                        }
-                    });
-                }
-
-                @Override
-                public void ifFail(Object task) {
-
-                }
-            });
-        });
-        login_btn.setOnClickListener(view -> {
-            user.login(email.getText().toString(), password.getText().toString(), new Acts() {
-                @Override
-                public void ifSuccess(Object task) {
-                    afterLoginSuccess(mDB, user_name, user_point);
-                }
-
-                @Override
-                public void ifFail(Object task) {
-
-                }
-            });
-        });
-        logout_btn.setOnClickListener(view -> {
-            user.logout();
-            user_name.setText("-----");
-            user_point.setText(String.valueOf(0));
-        });
-        delete_btn.setOnClickListener(view -> {
-            user.delete(new Acts() {
-                @Override
-                public void ifSuccess(Object task) {
-                    user_name.setText("-----");
-                    user_point.setText(String.valueOf(0));
-                }
-
-                @Override
-                public void ifFail(Object task) {
-
-                }
-            });
-        });
-
-        Button write_btn = findViewById(R.id.write_btn);
-        Button read_btn = findViewById(R.id.read_btn);
-        write_btn.setOnClickListener(view -> {
-            mDB.readUser(new Acts() {
-                @Override
-                public void ifSuccess(Object task) {
-                    User.Data data = ((Task<DataSnapshot>) task).getResult().getValue(User.Data.class);
-                    data.setPoint(data.getPoint()+1);
-                    mDB.writeUser(data);
-                }
-
-                @Override
-                public void ifFail(Object task) {
-
-                }
-            });
-        });
-        read_btn.setOnClickListener(view -> {
-            mDB.readUser(new Acts() {
-                @Override
-                public void ifSuccess(Object task) {
-                    User.Data data = ((Task<DataSnapshot>) task).getResult().getValue(User.Data.class);
-                    user_name.setText(data.getName());
-                    user_point.setText(String.valueOf(data.getPoint()));
-                }
-
-                @Override
-                public void ifFail(Object task) {
-
-                }
-            });
-        });*/
+//        //유저 로그인 및 유저 정보 저장(예시)
+//        EditText email = findViewById(R.id.email);
+//        EditText password = findViewById(R.id.password);
+//        Button create_btn = findViewById(R.id.create_btn);
+//        Button login_btn = findViewById(R.id.login_btn);
+//        Button logout_btn = findViewById(R.id.logout_btn);
+//        Button delete_btn = findViewById(R.id.delete_btn);
+//        TextView user_name = findViewById(R.id.name);
+//        TextView user_point = findViewById(R.id.point);
+//
+//        User user = new User(getApplicationContext());
+//
+//        if (mDB.getAuth().getCurrentUser() != null){
+//            mDB.getAuth().signOut();
+//        }
+//
+//        user_name.setText("-----");
+//        user_point.setText(String.valueOf(0));
+//
+//        create_btn.setOnClickListener(view -> {
+//            Boolean isManager = true;
+//            String name = "dirtfy";
+//            Long point = Long.valueOf(1000);
+//            User.Data data = new User.Data(isManager, name, point);
+//            user.create(email.getText().toString(), password.getText().toString(), new Acts() {
+//                @Override
+//                public void ifSuccess(Object task) {
+//                    mDB.writeUser(data);
+//                    user_name.setText(name);
+//                    user_point.setText(String.valueOf(point));
+//                    user.login(email.getText().toString(), password.getText().toString(), new Acts() {
+//                        @Override
+//                        public void ifSuccess(Object task) {
+//                            afterLoginSuccess(mDB, user_name, user_point);
+//                        }
+//
+//                        @Override
+//                        public void ifFail(Object task) {
+//
+//                        }
+//                    });
+//                }
+//
+//                @Override
+//                public void ifFail(Object task) {
+//
+//                }
+//            });
+//        });
+//        login_btn.setOnClickListener(view -> {
+//            user.login(email.getText().toString(), password.getText().toString(), new Acts() {
+//                @Override
+//                public void ifSuccess(Object task) {
+//                    afterLoginSuccess(mDB, user_name, user_point);
+//                }
+//
+//                @Override
+//                public void ifFail(Object task) {
+//
+//                }
+//            });
+//        });
+//        logout_btn.setOnClickListener(view -> {
+//            user.logout();
+//            user_name.setText("-----");
+//            user_point.setText(String.valueOf(0));
+//        });
+//        delete_btn.setOnClickListener(view -> {
+//            user.delete(new Acts() {
+//                @Override
+//                public void ifSuccess(Object task) {
+//                    user_name.setText("-----");
+//                    user_point.setText(String.valueOf(0));
+//                }
+//
+//                @Override
+//                public void ifFail(Object task) {
+//
+//                }
+//            });
+//        });
+//
+//        Button write_btn = findViewById(R.id.write_btn);
+//        Button read_btn = findViewById(R.id.read_btn);
+//        write_btn.setOnClickListener(view -> {
+//            mDB.readUser(new Acts() {
+//                @Override
+//                public void ifSuccess(Object task) {
+//                    User.Data data = ((Task<DataSnapshot>) task).getResult().getValue(User.Data.class);
+//                    data.setPoint(data.getPoint()+1);
+//                    mDB.writeUser(data);
+//                }
+//
+//                @Override
+//                public void ifFail(Object task) {
+//
+//                }
+//            });
+//        });
+//        read_btn.setOnClickListener(view -> {
+//            mDB.readUser(new Acts() {
+//                @Override
+//                public void ifSuccess(Object task) {
+//                    User.Data data = ((Task<DataSnapshot>) task).getResult().getValue(User.Data.class);
+//                    user_name.setText(data.getName());
+//                    user_point.setText(String.valueOf(data.getPoint()));
+//                }
+//
+//                @Override
+//                public void ifFail(Object task) {
+//
+//                }
+//            });
+//        });
     }
 
     public void setFragment(int n) {
@@ -243,36 +255,36 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void afterLoginSuccess(Database mDB, TextView user_name, TextView user_point){
-        mDB.readUser(new Acts() {
-            @Override
-            public void ifSuccess(Object task) {
-                User.Data data = ((Task<DataSnapshot>) task).getResult().getValue(User.Data.class);
-                user_name.setText(data.getName());
-                user_point.setText(String.valueOf(data.getPoint()));
-                mDB.setUserValueEventListener(new Reacts() {
-                    @Override
-                    public void ifDataChanged(DataSnapshot dataSnapshot) {
-                        User.Data data = dataSnapshot.getValue(User.Data.class);
-                        if(data != null){
-                            user_name.setText(data.getName());
-                            user_point.setText(String.valueOf(data.getPoint()));
-                        }
-                    }
-
-                    @Override
-                    public void ifCancelled(DatabaseError error) {
-
-                    }
-                });
-            }
-
-            @Override
-            public void ifFail(Object task) {
-
-            }
-        });
-    }
+//    public void afterLoginSuccess(Database mDB, TextView user_name, TextView user_point){
+//        mDB.readUser(new Acts() {
+//            @Override
+//            public void ifSuccess(Object task) {
+//                User.Data data = ((Task<DataSnapshot>) task).getResult().getValue(User.Data.class);
+//                user_name.setText(data.getName());
+//                user_point.setText(String.valueOf(data.getPoint()));
+//                mDB.setUserValueEventListener(new Reacts() {
+//                    @Override
+//                    public void ifDataChanged(DataSnapshot dataSnapshot) {
+//                        User.Data data = dataSnapshot.getValue(User.Data.class);
+//                        if(data != null){
+//                            user_name.setText(data.getName());
+//                            user_point.setText(String.valueOf(data.getPoint()));
+//                        }
+//                    }
+//
+//                    @Override
+//                    public void ifCancelled(DatabaseError error) {
+//
+//                    }
+//                });
+//            }
+//
+//            @Override
+//            public void ifFail(Object task) {
+//
+//            }
+//        });
+//    }
 
     private boolean checkPermission(){
         int hasFineLocationPermission = ContextCompat.checkSelfPermission(this,Manifest.permission.ACCESS_FINE_LOCATION);
@@ -307,7 +319,8 @@ public class MainActivity extends AppCompatActivity {
             else{
                 //퍼미션 거부된거 있으면 종료
                 if(ActivityCompat.shouldShowRequestPermissionRationale(this,REQUIRED_PERMISSIONS[0])||
-                        ActivityCompat.shouldShowRequestPermissionRationale(this,REQUIRED_PERMISSIONS[1])){
+                        ActivityCompat.shouldShowRequestPermissionRationale(this,REQUIRED_PERMISSIONS[1])||
+                        ActivityCompat.shouldShowRequestPermissionRationale(this,REQUIRED_PERMISSIONS[2])){
                     //유저가 거부만 선택한 경우 앱 재실행시 퍼미션 허용 가능
                     Snackbar.make(mainActivityLayout, "권한이 거부되었습니다. 앱을 다시 실행하여 권한을 허용해주세요.", Snackbar.LENGTH_INDEFINITE).setAction("확인", new View.OnClickListener() {
                         @Override
