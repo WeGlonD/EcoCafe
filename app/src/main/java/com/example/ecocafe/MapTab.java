@@ -201,6 +201,7 @@ public class MapTab extends Fragment implements OnMapReadyCallback, ActivityComp
 
 
         googleMap.getUiSettings().setMyLocationButtonEnabled(true);
+        googleMap.getUiSettings().setZoomControlsEnabled(true);
 
         googleMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
             @Override
