@@ -17,6 +17,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.provider.Settings;
 import android.util.Log;
 import android.view.MenuItem;
@@ -65,7 +66,7 @@ public class MainActivity extends AppCompatActivity {
         ((Button)findViewById(R.id.button)).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent it = new Intent(MainActivity.this, Cafe_List.class);
+                Intent it = new Intent(MainActivity.this, PhotoActivity.class);
                 startActivity(it);
             }
         });

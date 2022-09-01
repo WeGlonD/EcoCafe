@@ -41,7 +41,7 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".Cafe_List"
+        <activity android:name=".PhotoActivity"
             android:exported="true">
         </activity>
         <meta-data
