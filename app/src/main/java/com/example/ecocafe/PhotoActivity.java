@@ -21,6 +21,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.core.content.FileProvider;
+
 import com.example.ecocafe.firebase.Acts;
 import com.example.ecocafe.firebase.Database;
 import com.example.ecocafe.firebase.Post;
@@ -60,7 +62,8 @@ public class PhotoActivity extends Activity implements View.OnClickListener {
         Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         // 임시로 사용할 파일의 경로를 생성
         String url = "tmp_" + String.valueOf(System.currentTimeMillis()) + ".jpg";
-        mImageCaptureUri = Uri.fromFile(new File(Environment.getExternalStorageDirectory(), url));
+        //mImageCaptureUri = Uri.fromFile(new File(Environment.getExternalStorageDirectory(), url));
+        mImageCaptureUri = FileProvider.getUriForFile(this, "com.example.ecocafe.fileprovider", new File(Environment.getExternalStorageDirectory(), url));
         intent.putExtra(android.provider.MediaStore.EXTRA_OUTPUT, mImageCaptureUri);
         startActivityForResult(intent, PICK_FROM_CAMERA);
     }
@@ -199,6 +202,8 @@ public class PhotoActivity extends Activity implements View.OnClickListener {
             // sendBroadcast를 통해 Crop된 사진을 앨범에 보이도록 갱신한다.
             sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE,
                     Uri.fromFile(copyFile)));
+                    //FileProvider.getUriForFile(this, "com.example.ecocafe.fileprovider", copyFile)));
+
             out.flush();
             out.close();
         } catch (Exception e) {
