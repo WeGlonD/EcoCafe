@@ -25,6 +25,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.ecocafe.firebase.Acts;
 import com.example.ecocafe.firebase.Database;
@@ -47,7 +48,7 @@ public class MainActivity extends AppCompatActivity {
     ConstraintLayout mainActivityLayout;
 
     private static final int PERMISSIONS_REQUEST_CODE = 100;
-    String[] REQUIRED_PERMISSIONS = {android.Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.CAMERA};
+    String[] REQUIRED_PERMISSIONS = {android.Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE};
     private static final int GPS_ENABLE_REQUEST_CODE = 2001;
     boolean needRequest = false;
 
@@ -71,12 +72,16 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        //위치 퍼미션 체크,카메라 권한 체크
+        //위치 퍼미션 체크,카메라 권한,저장소 접근 권한 체크
         int hasFineLocationPermission = ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION);
         int hasCoarseLocationPermission = ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION);
         int CameraPermissionCheck = ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.CAMERA);
+        int hasWriteExternalStoragePermission = ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        int hasReadExternalStoragePermission = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE);
 
-        if(hasFineLocationPermission == PackageManager.PERMISSION_GRANTED && hasCoarseLocationPermission == PackageManager.PERMISSION_GRANTED && CameraPermissionCheck == PackageManager.PERMISSION_GRANTED){
+        if(hasFineLocationPermission == PackageManager.PERMISSION_GRANTED && hasCoarseLocationPermission == PackageManager.PERMISSION_GRANTED &&
+                CameraPermissionCheck == PackageManager.PERMISSION_GRANTED && hasWriteExternalStoragePermission == PackageManager.PERMISSION_GRANTED &&
+                hasReadExternalStoragePermission == PackageManager.PERMISSION_GRANTED){
             //startLocationUpdates();
         }else{
             //퍼미션 거부한 적 있는 경우
@@ -90,6 +95,14 @@ public class MainActivity extends AppCompatActivity {
             }
             else if(ActivityCompat.shouldShowRequestPermissionRationale(this,REQUIRED_PERMISSIONS[2])){
                 Snackbar.make(mainActivityLayout, "이 앱을 실행하려면 카메라 접근 권한이 필요합니다.", Snackbar.LENGTH_INDEFINITE).setAction("확인", new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        ActivityCompat.requestPermissions(mainInstance, REQUIRED_PERMISSIONS, PERMISSIONS_REQUEST_CODE);
+                    }
+                }).show();
+            }
+            else if(ActivityCompat.shouldShowRequestPermissionRationale(this,REQUIRED_PERMISSIONS[3])){
+                Snackbar.make(mainActivityLayout, "이 앱을 실행하려면 저장소 접근 권한이 필요합니다.", Snackbar.LENGTH_INDEFINITE).setAction("확인", new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
                         ActivityCompat.requestPermissions(mainInstance, REQUIRED_PERMISSIONS, PERMISSIONS_REQUEST_CODE);
@@ -320,7 +333,9 @@ public class MainActivity extends AppCompatActivity {
                 //퍼미션 거부된거 있으면 종료
                 if(ActivityCompat.shouldShowRequestPermissionRationale(this,REQUIRED_PERMISSIONS[0])||
                         ActivityCompat.shouldShowRequestPermissionRationale(this,REQUIRED_PERMISSIONS[1])||
-                        ActivityCompat.shouldShowRequestPermissionRationale(this,REQUIRED_PERMISSIONS[2])){
+                        ActivityCompat.shouldShowRequestPermissionRationale(this,REQUIRED_PERMISSIONS[2])||
+                        ActivityCompat.shouldShowRequestPermissionRationale(this,REQUIRED_PERMISSIONS[3])||
+                        ActivityCompat.shouldShowRequestPermissionRationale(this,REQUIRED_PERMISSIONS[4])){
                     //유저가 거부만 선택한 경우 앱 재실행시 퍼미션 허용 가능
                     Snackbar.make(mainActivityLayout, "권한이 거부되었습니다. 앱을 다시 실행하여 권한을 허용해주세요.", Snackbar.LENGTH_INDEFINITE).setAction("확인", new View.OnClickListener() {
                         @Override
